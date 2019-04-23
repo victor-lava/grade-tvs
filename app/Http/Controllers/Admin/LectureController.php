@@ -15,7 +15,11 @@ class LectureController extends Controller
      */
     public function index()
     {
-        //
+        $lectures = Lecture::orderBy('name')->get();
+
+        // ['lectures' => $lectures]; compact('lectures');
+
+        return view('admin/lectures/index', compact('lectures'));
     }
 
     /**
@@ -37,10 +41,7 @@ class LectureController extends Controller
     public function store(Request $request)
     {
         // dd($request);
-        $request->validate([
-          'name' => 'required',
-          'description' => 'required'
-        ]);
+        $this->validateRequest($request);
 
         // Neveikia, kol nera nusirodyti fillable laukai Lecture modelyje
         // dd($request->all());
@@ -66,7 +67,7 @@ class LectureController extends Controller
      */
     public function show(Lecture $lecture)
     {
-        //
+
     }
 
     /**
@@ -77,7 +78,7 @@ class LectureController extends Controller
      */
     public function edit(Lecture $lecture)
     {
-        //
+        return view('admin/lectures/edit', compact('lecture'));
     }
 
     /**
@@ -89,7 +90,23 @@ class LectureController extends Controller
      */
     public function update(Request $request, Lecture $lecture)
     {
-        //
+
+      $this->validateRequest($request);
+
+      // $lecture->name = $request->name;
+      // $lecture->description = $request->description;
+      // $lecture->save();
+
+      Lecture::updateOrCreate(['id' => $lecture->id], $request->all());
+
+      return redirect()->route('lectures.edit', $lecture->id)->with('message', 'Įrašas sėkmingai atnaujintas.');
+    }
+
+    public function validateRequest($request) {
+      $request->validate([
+        'name' => 'required',
+        'description' => 'required',
+      ]);
     }
 
     /**
@@ -100,6 +117,8 @@ class LectureController extends Controller
      */
     public function destroy(Lecture $lecture)
     {
-        //
+        $lecture->delete();
+
+        return redirect()->route('lectures.index')->with('message', "Įrašas #$lecture->id ($lecture->name) sėkmingai ištrintas.");
     }
 }

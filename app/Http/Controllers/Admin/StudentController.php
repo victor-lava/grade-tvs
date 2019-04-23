@@ -15,7 +15,11 @@ class StudentController extends Controller
      */
     public function index()
     {
-        //
+      $students = Student::orderBy('surname')->get();
+
+      // ['lectures' => $students]; compact('lectures');
+
+      return view('admin/students/index', compact('students'));
     }
 
     /**
@@ -25,7 +29,7 @@ class StudentController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin/students/create');
     }
 
     /**
@@ -36,7 +40,20 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+      $this->validateRequest($request);
+
+      Student::create($request->all());
+
+      return redirect()->route('students.create')->with('message', 'Įrašas sėkmingai sukurtas.');
+    }
+
+    public function validateRequest($request) {
+      $request->validate([
+        'name' => 'required',
+        'surname' => 'required',
+        'email' => 'required|email',
+        'phone' => 'required'
+      ]);
     }
 
     /**
@@ -58,7 +75,7 @@ class StudentController extends Controller
      */
     public function edit(Student $student)
     {
-        //
+        return view('admin/students/edit', compact('student'));
     }
 
     /**
@@ -70,7 +87,15 @@ class StudentController extends Controller
      */
     public function update(Request $request, Student $student)
     {
-        //
+      $this->validateRequest($request);
+
+      // $lecture->name = $request->name;
+      // $lecture->description = $request->description;
+      // $lecture->save();
+
+      Student::updateOrCreate(['id' => $student->id], $request->all());
+
+      return redirect()->route('students.edit', $student->id)->with('message', 'Įrašas sėkmingai atnaujintas.');
     }
 
     /**
@@ -81,6 +106,8 @@ class StudentController extends Controller
      */
     public function destroy(Student $student)
     {
-        //
+      $student->delete();
+
+      return redirect()->route('students.index')->with('message', "Įrašas #$student->id ($student->name) sėkmingai ištrintas.");
     }
 }
