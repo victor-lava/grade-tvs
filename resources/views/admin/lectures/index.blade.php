@@ -24,7 +24,12 @@
               {{ $lecture->created_at }}
             </span>
           </h5>
-          <p class="card-text">{{ $lecture->description }}</p>
+          <p class="card-text">
+            {!! $lecture->description !!}
+            
+            {{-- XSS --}}
+            {{-- leidžia atspausdinti html tagus --}}
+          </p>
           <a href="{{ route('lectures.edit', $lecture->id)   }}" class="btn btn-primary">Redaguoti</a>
 
           <form action="{{ route('lectures.destroy', $lecture->id) }}" method="post">
